@@ -1,0 +1,5 @@
+
+INCLUDEPATH +=$$PWD/Src/Include
+
+
+LIBS +=-L$${LIB_DIR_PATH}/ -lKTPF$${FILE_POSTFIX}
