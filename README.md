@@ -36,9 +36,19 @@ m_pToolPane->setRunFunObj(new(std::nothrow) ButtonFun);
 在该对象中，添加自定义的按钮所要执行的方法
 
 ```
+public Q_SLOTS:
     bool newFile(const QString &strParam);
     bool saveFile(const QString &strParam);
 ```
+
+若果发现控制台输出这样类似的错误
+
+```
+QMetaObject::invokeMethod: No such method ButtonFun::xxx(const QString)
+QMetaObject::invokeMethod: No such method ButtonFun::xxx(const QString)
+```
+
+那么就是你没有编写对应的函数方法，补充添加上即可
 
 ### 03 初始化面板数据
 
@@ -105,5 +115,11 @@ m_pToolPane->setRunFunObj(new(std::nothrow) ButtonFun);
 
 - 如果某个按钮有 二级面板,则只需要在 `second`字段中中嵌套配置即可；
 - 按钮 `buttonID` 可以随意，但是要始终唯一，二级按钮的 `buttonID`可以和以及面板的按钮`buttonID`一样；
+- 每个按钮对应的参数个数为字符串，如果需要则填写，不需要给空即可，这个参数会在调用具体函数的时候传递；
+
+
+### 感谢
+
+如果对你有用，欢迎 `star` 和 `fork`
 
 
