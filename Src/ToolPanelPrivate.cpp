@@ -14,6 +14,13 @@ DS_ButtonData::~DS_ButtonData()
 
 void DS_ButtonData::reset()
 {
+    m_nButtonID = -1;
+    m_strButtonName = "";
+    m_strButtonTip  = "";
+    m_strButtonFun  = "";
+    m_strButtonParam = "";
+    m_bEnable   = false;
+
     qDeleteAll(m_vtrpButtonData);
     m_vtrpButtonData.clear();
 }
@@ -28,7 +35,7 @@ QVariantMap DS_ButtonData::toMap()
 
     QVariantMap map = {
         {"buttonID", m_nButtonID}, {"buttonName", m_strButtonName}, {"buttonTip", m_strButtonTip}, {"buttonIcon", m_strButtonIcon},
-        {"buttonFun", m_strButtonFun}, {"param", m_strButtonParam}, {"second", lschildren}
+        {"buttonFun", m_strButtonFun}, {"param", m_strButtonParam}, {"buttonEnable", m_bEnable},{"second", lschildren}
     };
 
     return map;
@@ -52,6 +59,7 @@ bool DS_ButtonData::fromMap(const QVariantMap &map)
     m_strButtonIcon     = map.value("buttonIcon").toString();
     m_strButtonFun      = map.value("buttonFun").toString();
     m_strButtonParam    = map.value("param").toString();
+    m_bEnable           = map.value("buttonEnable").toBool();
 
     QVariantList lsChildren = map.value("second").toList();
 
@@ -96,6 +104,23 @@ QVariantList DS_ButtonData::geetChildrenData()
     return lschildren;
 }
 
+DS_ButtonData *DS_ButtonData::getChildrenPtr(int nButtonID)
+{
+    vtrpButtonData::iterator iter = m_vtrpButtonData.begin();
+
+    for (; iter != m_vtrpButtonData.end(); iter++)
+    {
+        DS_ButtonData* pData = static_cast<DS_ButtonData*>(*iter);
+
+        if (nullptr != pData && pData->m_nButtonID == nButtonID)
+        {
+            return pData;
+        }
+    }
+
+    return nullptr;
+}
+
 
 ToolPanelPrivate::ToolPanelPrivate()
 {
@@ -106,6 +131,8 @@ ToolPanelPrivate::~ToolPanelPrivate()
 {
     qDeleteAll(m_vtrpButtonPanel);
     m_vtrpButtonPanel.clear();
+
+    m_pRunFunObj = nullptr;
 }
 
 bool ToolPanelPrivate::initPanelData(const QString &strData)
@@ -140,6 +167,41 @@ bool ToolPanelPrivate::initPanelData(const QString &strData)
     return lsData.isEmpty() ? false : true;
 }
 
+void ToolPanelPrivate::onButtonClick(int nPanelType, int nParentBtnID, int nButtonID)
+{
+    DS_ButtonData* pButtonPanelData = nullptr;
+
+    if (nPanelType == PanelType_Button)
+    {
+        pButtonPanelData = getButtonDataPtr(nButtonID);
+    }
+    else if (nPanelType == PanelType_SecondButton)
+    {
+        pButtonPanelData = getButtonSecondDataPtr(nParentBtnID, nButtonID);
+    }
+
+    if (nullptr == pButtonPanelData)
+    {
+        qWarning() << "faile find buttonData ... " << nPanelType << nParentBtnID << nButtonID;
+        return;
+    }
+
+    if (nullptr == m_pRunFunObj)
+    {
+        qWarning() << "pRunFunObj is null you may forget set runObj";
+        return;
+    }
+
+    QByteArray baFun = pButtonPanelData->m_strButtonFun.toLocal8Bit();
+    bool bResult = false;
+
+    QMetaObject::invokeMethod(m_pRunFunObj,
+                              baFun.data(),
+                              Qt::DirectConnection,
+                              Q_RETURN_ARG(bool, bResult),
+                              Q_ARG(const QString, pButtonPanelData->m_strButtonParam));
+}
+
 ButtonPanelBase *ToolPanelPrivate::getButtonPanel(PanelType eType)
 {
     if (eType < 0 || eType >= m_vtrpButtonPanel.size())
@@ -150,10 +212,9 @@ ButtonPanelBase *ToolPanelPrivate::getButtonPanel(PanelType eType)
     return m_vtrpButtonPanel[eType];
 }
 
-QVariantList ToolPanelPrivate::getSecondPanelData(int nIndex)
+QVariantList ToolPanelPrivate::getSecondPanelData(int nButtonID)
 {
-    // 这里确保 index 和 nButtonID一致
-    DS_ButtonData* pButtonDataPtr = getButtonDataPtr(nIndex);
+    DS_ButtonData* pButtonDataPtr = getButtonDataPtr(nButtonID);
 
     if (nullptr == pButtonDataPtr)
     {
@@ -178,6 +239,18 @@ DS_ButtonData *ToolPanelPrivate::getButtonDataPtr(int nButtonID)
     }
 
     return nullptr;
+}
+
+DS_ButtonData *ToolPanelPrivate::getButtonSecondDataPtr(int nParentBtnID, int nButtonID)
+{
+    DS_ButtonData* pButtonData = getButtonDataPtr(nParentBtnID);
+
+    if (nullptr == pButtonData)
+    {
+        return nullptr;
+    }
+
+    return pButtonData->getChildrenPtr(nButtonID);
 }
 
 QVariantList ToolPanelPrivate::getButtonPanelData()

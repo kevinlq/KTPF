@@ -1,6 +1,7 @@
 #include "FancyTab.h"
 
 #include <QWidget>
+#include <QVariantMap>
 
 void FancyTab::fadeIn()
 {
@@ -34,6 +35,13 @@ bool FancyTab::fromMap(const QVariantMap &map)
     text            = map.value("buttonName").toString();
     toolTip         = map.value("buttonTip").toString();
     m_strButtonFun  = map.value("buttonFun").toString();
+    enabled         = map.value("buttonEnable").toBool();
+    hasSecond       = false;
+
+    if (map.contains("second") && !map.value("second").toList().isEmpty())
+    {
+        hasSecond = true;
+    }
 
     return true;
 }

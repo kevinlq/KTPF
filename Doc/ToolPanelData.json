@@ -1,0 +1,55 @@
+[
+    {
+        "buttonID": 0,
+        "buttonName": "btn0",
+        "buttonTip": "btn0",
+		"buttonIcon": ":/images/category_core.png",
+        "buttonFun": "newFile",
+		"buttonEnable": true,
+        "param": "",
+        "second": []
+    },
+    {
+        "buttonID": 1,
+        "buttonName": "btn1",
+        "buttonTip": "btn1",
+		"buttonIcon": ":/images/mode_debug.png",
+        "buttonFun": "saveFile",
+		"buttonEnable": true,
+        "param": "",
+        "second": [
+            {
+                "buttonID": 0,
+                "buttonName": "sec0",
+                "buttonTip": "sec0",
+				"buttonIcon": ":/images/mode_Design.png",
+                "buttonFun": "savePng0",
+				"buttonEnable": true,
+                "param": "",
+                "second": [
+                ]
+            },
+			 {
+                "buttonID": 1,
+                "buttonName": "sec1",
+                "buttonTip": "sec1",
+				"buttonIcon": ":/images/mode_Design.png",
+                "buttonFun": "savePng1",
+				"buttonEnable": true,
+                "param": "",
+                "second": [
+                ]
+            }
+        ]
+    },
+	{
+        "buttonID": 2,
+        "buttonName": "btn2",
+        "buttonTip": "btn2",
+		"buttonIcon": ":/images/mode_help.png",
+        "buttonFun": "help",
+		"buttonEnable": true,
+        "param": "",
+        "second": []
+    }
+]

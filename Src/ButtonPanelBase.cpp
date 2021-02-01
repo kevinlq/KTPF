@@ -11,8 +11,6 @@
 #include <QApplication>
 #include <QtMath>
 
-const int ButtonPanelBase::m_rounding = 22;
-const int ButtonPanelBase::m_textPadding = 4;
 static const int kMenuButtonWidth = 16;
 
 
@@ -55,6 +53,7 @@ bool ButtonPanelBase::event(QEvent *event)
             }
         }
     }
+
     return QWidget::event(event);
 }
 
@@ -62,7 +61,9 @@ void ButtonPanelBase::paintEvent(QPaintEvent *event)
 {
     QPainter p(this);
 
-    p.fillRect(event->rect(), QColor(255,200,200, 200));
+    QRect rcPanel = this->rect();
+    p.fillRect(event->rect(), QColor(64,65,66, 200));
+    p.drawRect(rcPanel);
 
     for (int i = 0; i < count(); ++i)
     {
@@ -90,6 +91,11 @@ void ButtonPanelBase::mousePressEvent(QMouseEvent *e)
         {
             if (isTabEnabled(index))
             {
+                int nButtonID = m_pImpl->getButtonID(index);
+
+                m_nCurrentIndex = index;
+                update();
+
                 if (m_pImpl->hasSecondButton(index))
                 {
                     // show secondpanel
@@ -97,11 +103,8 @@ void ButtonPanelBase::mousePressEvent(QMouseEvent *e)
                 }
                 else
                 {
-                    m_nCurrentIndex = index;
-                    update();
-
                     // update tab bar before showing widget
-                    QTimer::singleShot(0, this, [this]() { emit currentChanged(m_nCurrentIndex); });
+                    QTimer::singleShot(0, this, [this, &nButtonID]() { emit currentChanged(nButtonID); });
                 }
             }
             break;
@@ -127,14 +130,14 @@ void ButtonPanelBase::mouseMoveEvent(QMouseEvent *e)
 
     if (validIndex(m_nHoverIndex))
     {
-        m_pImpl->getButtonTabForIndexPtr(m_nHoverIndex)->fadeOut();
+        //m_pImpl->getButtonTabForIndexPtr(m_nHoverIndex)->fadeOut();
     }
 
     m_nHoverIndex = newHover;
 
     if (validIndex(m_nHoverIndex))
     {
-        m_pImpl->getButtonTabForIndexPtr(m_nHoverIndex)->fadeIn();
+        //m_pImpl->getButtonTabForIndexPtr(m_nHoverIndex)->fadeIn();
 
         m_hoverRect = tabRect(m_nHoverIndex);
     }
@@ -177,7 +180,7 @@ void ButtonPanelBase::drawButtonTab(QPainter *painter, int tabIndex)
 
     if (selected)
     {
-        painter->fillRect(rect, QColor(34,34,34));
+        painter->fillRect(rect, QColor(34,34,34,160));
     }
 
     QString tabText(tab->text);
@@ -201,7 +204,7 @@ void ButtonPanelBase::drawButtonTab(QPainter *painter, int tabIndex)
 
         painter->setOpacity(fader);
 
-        painter->fillRect(rect, QColor("28ffffff"));
+        painter->fillRect(rect, QColor(197,200,201));
 
         painter->restore();
     }
@@ -224,14 +227,15 @@ void ButtonPanelBase::drawButtonTab(QPainter *painter, int tabIndex)
 
     if (enabled)
     {
-        painter->setPen(QColor("b6fbfdff"));
+        painter->setPen(QColor(98,98,100));
     }
     else
     {
-        painter->setPen(QColor("56a5a6a7"));
+        painter->setPen(QColor(197,200,201));
     }
 
     painter->translate(0, -1);
+    painter->setPen(QColor(255,255,255));
     painter->drawText(tabTextRect, textFlags, tabText);
 
     // menu arrow
@@ -345,6 +349,16 @@ QString ButtonPanelBase::tabToolTip(int index) const
     return m_pImpl->tabToolTip(index);
 }
 
+void ButtonPanelBase::setParentButtonID(int nID)
+{
+    m_nParentButtonID   = nID;
+}
+
+int ButtonPanelBase::getParentButtonID() const
+{
+    return m_nParentButtonID;
+}
+
 void ButtonPanelBase::drawIconWithShadow(const QIcon &icon, const QRect &rect, QPainter *p
                                          , QIcon::Mode iconMode, int dipRadius
                                          , const QColor &color, const QPoint &dipOffset)
@@ -453,7 +467,7 @@ ButtonPanel::~ButtonPanel()
 ButtonSecondPanel::ButtonSecondPanel(QWidget *parent)
     :ButtonPanelBase(parent)
 {
-    setWindowFlags(Qt::FramelessWindowHint);
+    //setWindowFlags(Qt::FramelessWindowHint);
 
     setMouseTracking(true);
 }
@@ -462,21 +476,14 @@ ButtonSecondPanel::~ButtonSecondPanel()
 {
 }
 
-void ButtonSecondPanel::paintEvent(QPaintEvent *e)
+void ButtonSecondPanel::enterEvent(QEvent *e)
 {
-    Q_UNUSED(e);
-
-    //QPainter painter(this);
-
-    //painter.fillRect(this->rect(), QColor(64,65,66, 80));
-}
-
-void ButtonSecondPanel::enterEvent(QEvent *)
-{
+    ButtonPanelBase::enterEvent(e);
 }
 
 void ButtonSecondPanel::leaveEvent(QEvent *e)
 {
-    Q_UNUSED(e);
+    ButtonPanelBase::leaveEvent(e);
+
     this->setVisible(false);
 }

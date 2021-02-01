@@ -15,6 +15,8 @@ public:
 
     bool initPanelData(const QString &strData);
 
+    void setRunFunObj(QObject* pObj);
+
 protected:
     virtual void resizeEvent(QResizeEvent* e);
 

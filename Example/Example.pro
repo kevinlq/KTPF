@@ -13,8 +13,13 @@ INCLUDEPATH +=$$PWD/../Src/
 INCLUDEPATH +=$$PWD/../Src/Include
 
 SOURCES += \
+    ButtonFun.cpp \
     MainWindow.cpp \
     main.cpp
 
 HEADERS += \
+    ButtonFun.h \
     MainWindow.h
+
+RESOURCES += \
+    images.qrc

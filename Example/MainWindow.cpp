@@ -1,6 +1,7 @@
 #include "MainWindow.h"
 
 #include "ToolPanel.h"
+#include "ButtonFun.h"
 
 #include <QHBoxLayout>
 #include <QVBoxLayout>
@@ -15,6 +16,9 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent)
     m_pToolPane = new(std::nothrow) ToolPanel(this);
     m_pToolPane->setMinimumSize(30, this->height());
     m_pToolPane->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Expanding);
+    m_pToolPane->setMouseTracking(true);
+
+    m_pToolPane->setRunFunObj(new(std::nothrow) ButtonFun);
 
     QHBoxLayout* pHLayout = new QHBoxLayout;
     pHLayout->addWidget(m_pToolPane);
@@ -24,7 +28,7 @@ MainWindow::MainWindow(QWidget *parent) : QWidget(parent)
 
     setLayout(pHLayout);
 
-    QFile file("G:/dev/ToolPanelData.json");
+    QFile file(QString("%1/ToolPanelData.json").arg(LIB_DIR_PATH));
 
     if (!file.open(QIODevice::ReadOnly))
     {

@@ -16,6 +16,8 @@ public:
     FancyTab* getButtonTabForIndexPtr(int nIndex);
     FancyTab* getButtonTabPtr(int nButtonID);
 
+    int       getButtonID(int nIndex);
+
     bool hasSecondButton(int nIndex);
 
     bool isValid(int nIndex) const;
@@ -27,6 +29,8 @@ public:
     QString tabToolTip(int index) const;
 
     bool updateData(const QVariantList &lsData);
+
+    bool resetTabData();
 
 public:
     using ButtonTables = QList<FancyTab*>;

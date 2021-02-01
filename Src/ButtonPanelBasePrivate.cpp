@@ -44,6 +44,18 @@ FancyTab *ButtonPanelBasePrivate::getButtonTabPtr(int nButtonID)
     return nullptr;
 }
 
+int ButtonPanelBasePrivate::getButtonID(int nIndex)
+{
+    FancyTab* pTab = getButtonTabForIndexPtr(nIndex);
+
+    if (nullptr == pTab)
+    {
+        return -1;
+    }
+
+    return pTab->m_nButtonID;
+}
+
 bool ButtonPanelBasePrivate::hasSecondButton(int nIndex)
 {
     FancyTab* pTab = getButtonTabForIndexPtr(nIndex);
@@ -112,6 +124,8 @@ bool ButtonPanelBasePrivate::updateData(const QVariantList &lsData)
         return false;
     }
 
+    resetTabData();
+
     for (int i = 0; i < lsData.size(); i++)
     {
         QVariantMap map = lsData[i].toMap();
@@ -120,7 +134,6 @@ bool ButtonPanelBasePrivate::updateData(const QVariantList &lsData)
 
         if (pTab->fromMap(map))
         {
-            pTab->enabled = true;
             m_lsTable.push_back(pTab);
         }
         else
@@ -131,4 +144,12 @@ bool ButtonPanelBasePrivate::updateData(const QVariantList &lsData)
     }
 
     return lsData.isEmpty() ? false : true;
+}
+
+bool ButtonPanelBasePrivate::resetTabData()
+{
+    qDeleteAll(m_lsTable);
+    m_lsTable.clear();
+
+    return true;
 }
