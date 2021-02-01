@@ -4,9 +4,14 @@ KTPF is KToolPanelFrame
 简单封装了下一个二级面板功能控件，代码使用QWidget实现，面板数据通过JSON 进行配置，每个按钮执行的方法通过反射统一处理，对外预留自定义处理接口，
 详细可以看实现过程
 
+代码结构简单，易用
+
+![](/screen/project.png)
+
 ## 效果
 
 ![](/screen/Panel_Example.gif)
+
 
 
 ## 使用方法
